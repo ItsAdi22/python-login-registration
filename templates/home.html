@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+
+
+
+
+{% block content %}
+    {% if 'name' in session %}
+            
+
+        <div class="container">
+            <h3>Hello {{session.name}}, <br> This page is only visible for logged in users :)</h3>
+        </div>
+            
+    {% endif %}        
+{% endblock content %}        
+
+
