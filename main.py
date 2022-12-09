@@ -23,7 +23,46 @@ def home():
     else:    
         return render_template('home.html',title = 'home')
     
+@app.route('/profile',methods=['GET', 'POST'])
+def profile():
+    if 'name' in session:
+        if request.method == 'POST':
+            oldpassword = request.form.get('currentpass')
+            newpassword = request.form.get('newpass')
+ 
+            try:
+                cursor = mysql.connection.cursor()
+            except:
+                db_error = 1
+                message = "Couldn't connect to the database"
+                return render_template('users/login.html',title = 'Database Error',db_error = db_error,message=message)              
+            else:
+                sql = f"SELECT password from login WHERE password = '{oldpassword}'"
+                cursor.execute(sql)
+                correctpass = cursor.fetchone()
+                print(correctpass)
+                if correctpass:
+                    sql = "UPDATE login SET password = %s WHERE password = %s"
+                    value = (newpassword,oldpassword)
+                    cursor.execute(sql,value)
+                    mysql.connection.commit()
+                    
+                    passupdated = 1
+                    message = "Password Updated!"
+                    return render_template('users/profile.html',title = 'Password Updated',passupdated=passupdated,message=message)  
 
+                else:
+                    message = "current password is incorrect"   
+                    incorrect_pass = 1
+                    return render_template('users/profile.html',title = 'Current password invalid',incorrect_pass=incorrect_pass,message=message)   
+                
+            
+        else:
+            return render_template('users/profile.html',title = 'profile')  
+        
+    else:   
+        return redirect(url_for('login'))     
+    
 
 @app.route('/login',methods=['GET', 'POST'])
 def login():
