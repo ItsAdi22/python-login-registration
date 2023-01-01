@@ -39,8 +39,10 @@ def profile():
                 message = "Couldn't connect to the database"
                 return render_template('login.html',title = 'Database Error',db_error = db_error,message=message)              
             else:
-                sql = f"SELECT password from login WHERE password = '{oldpassword}'"
-                cursor.execute(sql)
+                sql = f"SELECT password FROM login WHERE email = %s AND password = %s"
+                value = (session['email'],oldpassword)
+                cursor.execute(sql,value)
+                
                 correctpass = cursor.fetchone()
                 print(correctpass)
                 if correctpass:
